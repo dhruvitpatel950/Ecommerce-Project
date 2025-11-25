@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5 text-center" style="max-width: 500px;">
+    <div class="alert alert-danger p-4">
+        <h3 class="mb-3">Account Blocked</h3>
+        <p>Your account has been blocked by admin. You cannot log in.</p>
+    </div>
+
+    <a href="{% url 'login' %}" class="btn btn-secondary mt-3">Back to Login</a>
+</div>
+{% endblock %}
