@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ product.name }}{% endblock %}
+
+{% block content %}
+<div class="container mt-5 mb-5">
+    
+    {% if messages %}
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show shadow-sm" role="alert">
+                        <i class="bi bi-info-circle-fill me-2"></i> {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+
+    <div class="row g-5">
+        
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm p-3">
+                <img src="{{ product.image.url }}" class="img-fluid rounded" alt="{{ product.name }}" style="max-height: 500px; object-fit: contain;">
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            
+            <h1 class="fw-bold mb-2">{{ product.name }}</h1>
+            {% if product.category %}
+                <span class="badge bg-secondary mb-3">{{ product.category.name }}</span>
+            {% endif %}
+
+            <div class="mb-4">
+                <h3 class="text-success fw-bold">₹{{ product.price }}</h3>
+                {% if product.stock > 0 %}
+                    <span class="badge bg-success">In Stock ({{ product.stock }})</span>
+                {% else %}
+                    <span class="badge bg-danger">Out of Stock</span>
+                {% endif %}
+            </div>
+
+            <p class="text-muted lead" style="font-size: 1rem;">
+                {{ product.description }}
+            </p>
+            
+            <hr class="my-4">
+
+            <div class="p-4 bg-light rounded-3 shadow-sm mb-4 border">
+                <h5 class="mb-3 fw-bold"><i class="bi bi-geo-alt-fill text-danger"></i> Check Delivery</h5>
+                <p class="small text-muted mb-2">Select your city to see if this item can be delivered.</p>
+
+                <form action="{% url 'check_availability' product.slug %}" method="POST" class="d-flex gap-2">
+                    {% csrf_token %}
+                    
+                    <select name="city_id" class="form-select" required>
+                        <option value="" selected disabled>Select your City</option>
+                        
+                        {% for state in states %}
+                            <optgroup label="{{ state.name }}">
+                                {% for city in state.cities.all %}
+                                    <option value="{{ city.id }}">{{ city.name }}</option>
+                                {% endfor %}
+                            </optgroup>
+                        {% endfor %}
+
+                    </select>
+                    
+                    <button type="submit" class="btn btn-dark">Check</button>
+                </form>
+            </div>
+
+            <div class="d-grid gap-2">
+                {% if request.user.is_authenticated %}
+                    
+                    {% if request.user.role == 'Customer' %}
+                        {% if product.stock > 0 %}
+                            <a href="{% url 'buy_product' product.slug %}" class="btn btn-warning btn-lg fw-bold text-dark shadow-sm">
+                                <i class="bi bi-cart-fill me-2"></i> Buy Now
+                            </a>
+                        {% else %}
+                            <button class="btn btn-secondary btn-lg" disabled>Out of Stock</button>
+                        {% endif %}
+                    {% endif %}
+
+                {% else %}
+                    <a href="{% url 'login' %}" class="btn btn-outline-primary btn-lg">Login to Purchase</a>
+                {% endif %}
+            </div>
+
+        </div>
+    </div>
+
+    {% if related_products %}
+    <div class="mt-5 pt-4">
+        <h3 class="fw-bold mb-4">You might also like</h3>
+        <div class="row">
+            {% for p in related_products %}
+            <div class="col-6 col-md-3 mb-4">
+                <div class="card h-100 shadow-sm border-0 product-card-hover">
+                    <img src="{{ p.image.url }}" class="card-img-top" alt="{{ p.name }}" style="height: 200px; object-fit: cover;">
+                    <div class="card-body">
+                        <h6 class="card-title text-truncate">{{ p.name }}</h6>
+                        <p class="fw-bold text-success">₹{{ p.price }}</p>
+                        <a href="{% url 'product_detail' p.slug %}" class="btn btn-sm btn-outline-primary w-100 stretched-link">View</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}

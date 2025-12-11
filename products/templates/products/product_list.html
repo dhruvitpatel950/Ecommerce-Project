@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    {% if is_search %}Search: {{ query }}{% else %}Home{% endif %}
+{% endblock %}
+
+{% block content %}
+
+<div class="home-wrapper">
+
+    {% if is_search %}
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="section-title mb-0">Search Results for "{{ query }}"</h2>
+            <a href="{% url 'product_list' %}" class="btn btn-outline-secondary btn-sm">Clear Search</a>
+        </div>
+
+        {% if search_results %}
+            <div class="product-grid">
+                {% for product in search_results %}
+                    <div class="product-card">
+                        <div class="product-img-box">
+                            <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                        </div>
+                        <div class="product-info">
+                            <p class="product-name">{{ product.name }}</p>
+                            <p class="product-price">₹{{ product.price }}</p>
+                            <a href="{% url 'product_detail' product.slug %}" class="view-btn">View</a>
+                            {% if request.user.is_authenticated and request.user.role == 'Customer' %}
+                                <a href="{% url 'buy_product' product.slug %}" class="buy-btn">Buy Now</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="text-center py-5">
+                <h4 class="text-muted">No products found matching "{{ query }}"</h4>
+                <a href="{% url 'product_list' %}" class="btn btn-primary mt-3">Go Back Home</a>
+            </div>
+        {% endif %}
+
+    {% else %}
+        <h2 class="section-title">Shop by Category</h2>
+
+        {% for category, products in category_products.items %}
+            <div class="category-section">
+                <h3 class="category-title">{{ category.name }}</h3>
+                <div class="product-grid">
+                    {% for product in products %}
+                        <div class="product-card">
+                            <div class="product-img-box">
+                                <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                            </div>
+                            <div class="product-info">
+                                <p class="product-name">{{ product.name }}</p>
+                                <p class="product-price">₹{{ product.price }}</p>
+                                <a href="{% url 'product_detail' product.slug %}" class="view-btn">View</a>
+                                {% if request.user.is_authenticated and request.user.role == 'Customer' %}
+                                    <a href="{% url 'buy_product' product.slug %}" class="buy-btn">Buy Now</a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+</div>
+
+{% endblock %}

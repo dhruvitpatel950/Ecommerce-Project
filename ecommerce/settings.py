@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'core',
     'ecommerce',
     'products',
+    'orders',
 ]
 
 MIDDLEWARE = [
@@ -52,6 +53,10 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+]
+
+AUTHENTICATION_BACKENDS = [
+    'accounts.backend.ManualAuthBackend', 
 ]
 
 ROOT_URLCONF = 'ecommerce.urls'
@@ -132,4 +137,6 @@ STATICFILES_DIRS = [BASE_DIR / "static"]
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / "media"
 
-AUTH_USER_MODEL = 'accounts.User'
+
+
+# AUTH_USER_MODEL = 'accounts.U
